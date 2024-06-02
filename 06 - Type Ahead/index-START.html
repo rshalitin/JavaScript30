@@ -1,23 +1,125 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Type Ahead 👀</title>
-  <link rel="stylesheet" href="style.css">
-  <link rel="icon" href="https://fav.farm/🔥" />
-</head>
-<body>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Type Ahead 👀</title>
+    <link rel="stylesheet" href="style.css" />
+    <link rel="icon" href="https://fav.farm/🔥" />
+  </head>
+  <body>
+    <form class="search-form">
+      <input type="text" class="search" placeholder="City or State" />
+      <ul class="suggestions">
+        <li>Filter for a city</li>
+        <li>or a state</li>
+      </ul>
+    </form>
+    <script>
+      const endpoint =
+        "https://gist.githubusercontent.com/Miserlou/c5cd8364bf9b2420bb29/raw/2bf258763cdddd704f8ffd3ea9a3e81d25e2c6f6/cities.json";
+      const cities = [];
+      fetch(endpoint)
+        .then((blob) => blob.json())
+        .then((data) => cities.push(...data));
+      console.log(cities);
 
-  <form class="search-form">
-    <input type="text" class="search" placeholder="City or State">
-    <ul class="suggestions">
-      <li>Filter for a city</li>
-      <li>or a state</li>
-    </ul>
-  </form>
-<script>
-const endpoint = 'https://gist.githubusercontent.com/Miserlou/c5cd8364bf9b2420bb29/raw/2bf258763cdddd704f8ffd3ea9a3e81d25e2c6f6/cities.json';
+      const findMatches = (wordToMatch, cities) => {
+        return cities.filter((place) => {
+          // using RegEx
+          // here we need to figure out if the city or state matches what was searched
+          // const regex = new RegExp(wordToMatch, "gi");
+          // return place.city.match(regex) || place.state.match(regex);
 
-</script>
-</body>
+          // without RegEx
+          return (
+            place.city.toLowerCase().includes(wordToMatch.toLowerCase()) ||
+            place.state.toLowerCase().includes(wordToMatch.toLowerCase())
+          );
+        });
+      };
+
+      function numberWithCommas(x) {
+        return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+      }
+
+      const displayMatches = (e) => {
+        // while (suggestions.lastElementChild) {
+        //   suggestions.removeChild(suggestions.lastElementChild);
+        // }
+        // const filteredData = findMatches(e.target.value, cities);
+        // filteredData.map((item) => {
+        //   const node = document.createElement("li");
+        //   const locationSpan = document.createElement("span");
+        //   const citySpan = document.createElement("span");
+        //   const stateSpan = document.createElement("span");
+        //   const populationSpan = document.createElement("span");
+
+        //   populationSpan.classList.add("population");
+        //   locationSpan.classList.add("name");
+        //   citySpan.classList.add("hl");
+        //   stateSpan.classList.add("hl");
+
+        //   const textCitySpan = document.createTextNode(`${item.city}`);
+        //   const textStateSpan = document.createTextNode(`${item.state}`);
+        //   const textPopulationSpan = document.createTextNode(
+        //     `${item.population}`
+        //   );
+        //   const textLocationSpan = document.createTextNode(
+        //     `${citySpan}, ${stateSpan}`
+        //   );
+
+        //   citySpan.appendChild(textCitySpan);
+        //   stateSpan.appendChild(textStateSpan);
+        //   populationSpan.appendChild(textPopulationSpan);
+
+        //   locationSpan.appendChild(citySpan);
+        //   locationSpan.appendChild(stateSpan);
+
+        //   node.appendChild(locationSpan);
+        //   node.appendChild(populationSpan);
+        //   suggestions.appendChild(node);
+        // });
+
+        const matchArray = findMatches(e.target.value, cities);
+        suggestions.innerHTML = ""; // Clear the current suggestions
+
+        matchArray.forEach((place) => {
+          const regex = new RegExp(e.target.value, "gi");
+          const cityName = place.city.replace(
+            regex,
+            `<span class="hl">${e.target.value}</span>`
+          );
+          const stateName = place.state.replace(
+            regex,
+            `<span class="hl">${e.target.value}</span>`
+          );
+
+          // Create the list item
+          const li = document.createElement("li");
+
+          // Create the span for the name
+          const nameSpan = document.createElement("span");
+          nameSpan.classList.add("name");
+          nameSpan.innerHTML = `${cityName}, ${stateName}`; // Use innerHTML to allow highlighting
+
+          // Create the span for the population
+          const populationSpan = document.createElement("span");
+          populationSpan.classList.add("population");
+          populationSpan.textContent = numberWithCommas(place.population);
+
+          // Append the spans to the list item
+          li.appendChild(nameSpan);
+          li.appendChild(populationSpan);
+
+          // Append the list item to the suggestions
+          suggestions.appendChild(li);
+        });
+      };
+
+      const inputSearch = document.querySelector(".search");
+      const suggestions = document.querySelector(".suggestions");
+
+      inputSearch.addEventListener("keyup", displayMatches);
+    </script>
+  </body>
 </html>
