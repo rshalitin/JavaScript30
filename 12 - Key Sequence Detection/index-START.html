@@ -7,6 +7,20 @@
     <link rel="icon" href="https://fav.farm/🔥" />
   </head>
   <body>
-    <script></script>
+    <script>
+      const arrayOfKeys = [];
+      const SECRET_CODE = "ransha";
+      const addNewKey = (e) => {
+        if (arrayOfKeys.length === 6) {
+          arrayOfKeys.shift();
+        }
+        arrayOfKeys.push(e.key);
+        console.log(arrayOfKeys);
+        if (arrayOfKeys.join("") === SECRET_CODE) {
+          cornify_add();
+        }
+      };
+      window.addEventListener("keyup", addNewKey);
+    </script>
   </body>
 </html>
